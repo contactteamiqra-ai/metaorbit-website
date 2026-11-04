@@ -1,6 +1,0 @@
-// Edit service copy here. The matching HTML remains readable without JavaScript.
-export const services = [
-  { id: 'websites', number: '01', title: 'Websites & eCommerce', intro: 'A better experience. A clearer next step.', description: 'Turn a confusing website into a useful place to discover, choose, and buy. Built around your customers and easy for your team to manage.', items: ['WordPress, Shopify, Wix & Squarespace', 'Store setup & redesign', 'Landing pages', 'Buying-journey improvements'] },
-  { id: 'automation', number: '02', title: 'AI & Workflow Automation', intro: 'Less copying and pasting. More moving forward.', description: 'Connect the tools you already use and take repetitive tasks off your team’s plate. Practical automation, with people in control.', items: ['n8n & Make workflows', 'Lead capture & follow-ups', 'Repetitive-task automation', 'Connections between business tools'] },
-  { id: 'crm', number: '03', title: 'CRM & Sales Funnels', intro: 'Keep every enquiry moving in the right direction.', description: 'Give your team a clear view of what comes next, from first contact to onboarding. Fewer loose ends and a more consistent customer experience.', items: ['Zoho CRM setup', 'Sales pipelines', 'Website-to-CRM connections', 'Enquiry & onboarding flows'] }
-];

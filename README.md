@@ -1,50 +1,61 @@
-# MetaOrbit homepage
+# MetaOrbit agency website — hero review stage
 
-A dependency-free static homepage for MetaOrbit. Important copy is rendered in HTML, with progressive enhancements for motion, navigation and an original WebGL orbital sculpture.
+A dependency-free, eight-page static website. The homepage hero and shared navigation are the current visual review checkpoint. Inner pages have distinct original content in restrained layouts; the new hero direction has not been rolled out to every page.
 
-## Local development
+## Run locally
 
-Requires Node.js 22 or later. No package installation, credentials, or external services are needed.
+Node.js 22 or later (24 LTS recommended). No npm install, credentials or external services are required.
 
 ```sh
 npm run dev
 ```
 
-The local server uses port 4173. Use the existing checkout; no additional worktree is needed.
-
-## Production
+Open `http://localhost:4173`. The development command builds all pages, watches `src/` and `scripts/`, and rebuilds after edits. Refresh the browser to see changes. Use the existing checkout; no extra worktree is required.
 
 ```sh
 npm run build
 npm run preview
 ```
 
-The build writes `dist/`. For a future Hostinger static deployment, upload the **contents** of `dist/` into the configured web root (typically `public_html`). No Node server is needed in production. Nothing has been deployed by this implementation.
+Stop the development server before previewing: both use port 4173. An alternative port can be set with the `PORT` environment variable. The production output is `dist/`.
 
-## Editing
+## Static routes
 
-- `src/index.html`: page copy, section structure, FAQs, portfolio placeholders and contact form.
-- `src/content.js`: editable service data. Keep the corresponding HTML service copy synchronized so it remains correct without JavaScript.
-- `src/styles.css`: palette, typography, responsive layout and transitions.
-- `src/orbit.js`: original WebGL geometry, lighting, pointer response and scroll-driven camera/zoom. The inline SVG remains visible when WebGL fails. Reduced motion disables ongoing motion; the sculpture remains static.
-- `src/experience.js` and `src/experience.css`: native-scroll chapter selection, hero handoff, website/workflow/pipeline scenes, portfolio clip/depth reveals, headline masks and process-path drawing. Desktop uses a sticky service stage at 1000px and above; smaller screens show inline scenes. Reduced motion shows static inline scenes at every width. No wheel/touch interception or scroll hijacking.
-- `src/assets/metaorbit_logo_white_HD.png`: the original 3064 × 912 transparent logo, fetched from `main` without merging or resetting local work. Header and footer use the unchanged PNG with proportional CSS sizing (240px desktop, 170px mobile).
-- The dark palette uses `#f59a2c` (RGB 245, 154, 44), the most frequent opaque orange pixel in the uploaded logo. It is defined once as `--orange`, read by WebGL, and used by the SVG fallback. The build copies assets without transforming them.
+- `/` — Home: positioning, the logo-derived hero, and routes into the site
+- `/services/` — Services overview: choose a starting point by business problem
+- `/services/websites-ecommerce/` — scope, buying journeys, inputs and handover
+- `/services/ai-workflow-automation/` — n8n/Make, practical AI, access and exceptions
+- `/services/crm-sales-funnels/` — Zoho CRM, enquiry ownership and pipeline handoffs
+- `/portfolio/` — explicitly labeled placeholders and future case-study requirements
+- `/about/` — focus, delivery approach and white-label agency support
+- `/contact/` — briefing guidance and an honest preview-only form
 
-There are no remote fonts, images, scripts, analytics, or runtime dependencies.
+Each URL has a real `index.html` file in its directory. Direct visits and refreshes do not need a JavaScript router, rewrite rule or SPA fallback. A future Hostinger upload should put the **contents** of `dist/` in the web root (usually `public_html`), retaining all directories. Assets use root-relative paths; this build is intended for the host's document root. Do not open the HTML via `file://`. Nothing has been deployed.
 
-## Contact and portfolio limitations
+## Content and shared navigation
 
-The contact form is a **preview only**. Its button validates fields locally; no request is sent, no message is delivered, and details are not saved. With JavaScript disabled the button is disabled. Before launch, connect an approved contact endpoint, add suitable spam protection and privacy information, and verify actual delivery. No business email address was invented.
+- `src/index.html` — homepage body content
+- `scripts/pages.mjs` — seven inner pages with distinct purposes and original copy
+- `scripts/site.mjs` — shared header/footer, document metadata and route list
+- `src/styles.css` — baseline typography, controls and palette
+- `src/site.css` — current hero, navigation and restrained inner-page layouts
+- `src/app.js` — menu, keyboard controls, safe preview form, homepage-only renderer loading
+- `scripts/build.mjs` — static page generation and unchanged asset copying
 
-The two original visual studies are clearly labeled project placeholders. Replace them with approved project assets and descriptions before presenting them as selected client work. No client results, logos, testimonials, partnerships or certifications are claimed.
+The header and footer use the **complete original transparent PNG**, unaltered. The root-level original logo from main is also preserved. Orange `#F59A2C` was sampled from the original logo.
 
-## Validation
+## Original orbital symbol
 
-Production build and Chromium checks cover desktop/mobile layouts (320, 375, 390, 768, 1024, 1440 and 1920px), section targets, mobile menu, FAQ expansion, contact feedback, JavaScript-free HTML, reduced motion and unavailable-WebGL fallback. Screenshots are saved locally in ignored `artifacts/`.
+`src/orbit.js` renders a volumetric extrusion of the orange symbol's raster silhouette, including its negative spaces. It uses the numeric signed-distance field in `src/assets/orbit-symbol.sdf`, with provenance and original-source SHA256 in `orbit-symbol.json`. The front/back, shallow side surfaces and small bevel are part of a 3D field; no rectangular logo plane, generic rings or sphere is used.
 
-Reference sites were not inspected during implementation. Initial remote Git checks failed inside the command sandbox. A subsequent read-only `git ls-remote origin HEAD` using the approved execution permission path succeeded through the existing configured proxy; GitHub is already permitted by the enforced package-manager network preset. No network settings or credentials need changing for repository reads. No network controls were bypassed. No code has been pushed, published or deployed.
+The PNG is sufficient for a recognizable silhouette. It is not vector artwork: fine edge detail is raster-derived and will not be as clean as an approved vector source. No different shape was substituted. The static fallback clips and colour-isolates the unchanged PNG at render time, excluding all lettering. Header/footer images receive no such processing.
 
-## Immersive redesign review
+`python3 scripts/derive-symbol.py` optionally regenerates the numeric geometry (requires Pillow, NumPy and SciPy). These are asset-authoring dependencies only; they are not needed to build, host or run the website.
 
-The redesign keeps the original logo and #F59A2C accent. Its motion explains a connected customer journey: first impression and purchase, connected automation, then enquiry progression. Portfolio previews remain original labeled visual studies. Live desktop/mobile browser recordings are provided separately for review; they are not production assets. Noomo was unavailable through the enforced network policy (HTTP 403), so no reference assets or layouts were inspected or copied.
+Motion is limited to small pointer and scroll responses. The renderer settles and stops requesting frames when idle, pauses offscreen, and uses a fixed front-facing pose under reduced motion. Without WebGL, or on load/context failure, the original-symbol fallback stays visible. Important content and navigation work without JavaScript.
+
+## Review limitations
+
+The overall visual direction is **not approved**. Hero review comes before extending this treatment across inner pages. Portfolio entries are placeholders, not completed work or claimed results. The contact form validates locally and explicitly says nothing is sent or saved; it remains disabled without JavaScript. Before launch it needs a real delivery endpoint, spam handling, privacy information and delivery verification. No team size, office, certification, client result, testimonial or partnership is invented.
+
+No merge or deployment is part of this review. Work continues on `feat/metaorbit-homepage` / PR #1.

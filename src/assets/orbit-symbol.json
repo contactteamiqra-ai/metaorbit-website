@@ -1,0 +1,16 @@
+{
+  "source": "metaorbit_logo_white_HD.png",
+  "sourceSha256": "038dd639f7d7ecc8e78e0f5651ee187b38e5ac074b9dc38f13d59aca5577ac16",
+  "sourceRectangle": [
+    1422,
+    35,
+    638,
+    852
+  ],
+  "width": 384,
+  "height": 512,
+  "worldHeight": 2.9,
+  "worldWidth": 2.1715962441314556,
+  "distanceRange": 0.22,
+  "note": "Numerical signed-distance geometry derived from original orange symbol pixels; no lettering, invented shapes, or modifications to original PNG."
+}

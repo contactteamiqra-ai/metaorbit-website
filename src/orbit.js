@@ -1,41 +1,32 @@
-// Original lightweight WebGL sculpture. No remote models, textures, or runtime dependencies.
-export function initOrbit(canvas, motion) {
-  const gl = canvas.getContext('webgl', { alpha: true, antialias: true, powerPreference: 'low-power' });
+// Extruded signed-distance geometry derived from the original orange logo symbol.
+// This renders a volume with front/back/side surfaces and the original negative spaces,
+// not a textured rectangular plane. The unmodified PNG remains the static fallback.
+export async function initOrbit(canvas, motion) {
+  const gl = canvas.getContext('webgl', {alpha:true, antialias:false, powerPreference:'low-power'});
   if (!gl) return;
   const stage = canvas.parentElement;
-  const compile = (type, source) => { const shader = gl.createShader(type); gl.shaderSource(shader, source); gl.compileShader(shader); if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) throw new Error('Shader unavailable'); return shader; };
-  const program = gl.createProgram();
-  gl.attachShader(program, compile(gl.VERTEX_SHADER, `attribute vec3 position; attribute vec3 normal; attribute vec3 color; uniform vec2 rotation; uniform float aspect; uniform float camera; uniform float zoom; varying vec3 vNormal; varying vec3 vColor; void main(){float c=cos(rotation.x),s=sin(rotation.x),d=cos(rotation.y),t=sin(rotation.y);mat3 rx=mat3(1.,0.,0.,0.,c,s,0.,-s,c);mat3 ry=mat3(d,0.,-t,0.,1.,0.,t,0.,d);vec3 p=ry*rx*position;vNormal=ry*rx*normal;vColor=color;p*=zoom;float z=camera-p.z;gl_Position=vec4(p.x*2.65/aspect,p.y*2.65, (z-2.)*.25,z);}`));
-  gl.attachShader(program, compile(gl.FRAGMENT_SHADER, `precision mediump float; varying vec3 vNormal; varying vec3 vColor; void main(){vec3 n=normalize(vNormal);vec3 light=normalize(vec3(-.6,1.,1.5));float diffuse=max(dot(n,light),0.);float spec=pow(max(dot(reflect(-light,n),vec3(0.,0.,1.)),0.),65.);float rim=pow(1.-abs(n.z),3.);gl_FragColor=vec4(vColor*(.44+.66*diffuse)+vec3(.48)*spec+vec3(.12)*rim,1.);}`));
-  gl.linkProgram(program); if (!gl.getProgramParameter(program, gl.LINK_STATUS)) return; gl.useProgram(program);
-  // CSS owns the brand accent so buttons and sculpture use the same base colour.
-  const accentHex = getComputedStyle(document.documentElement).getPropertyValue('--orange').trim();
-  const accent = [1, 3, 5].map(offset => parseInt(accentHex.slice(offset, offset + 2), 16) / 255);
-  const data = [];
-  function mesh(fn, uCount, vCount, color) {
-    const vertex = (u,v) => { const [p,n] = fn(u,v); data.push(...p,...n,...color); };
-    for(let i=0;i<uCount;i++) for(let j=0;j<vCount;j++){ const u=i/uCount,v=j/vCount,U=(i+1)/uCount,V=(j+1)/vCount; vertex(u,v);vertex(U,v);vertex(U,V);vertex(u,v);vertex(U,V);vertex(u,V); }
-  }
-  function rotate(p,a,b) { const [x,y,z]=p;const yy=y*Math.cos(a)-z*Math.sin(a),zz=y*Math.sin(a)+z*Math.cos(a);return [x*Math.cos(b)+zz*Math.sin(b),yy,-x*Math.sin(b)+zz*Math.cos(b)]; }
-  for(const [a,b,col] of [[.9,.35,[.69,.70,.72]],[-.9,-.45,accent],[.22,1.14,[.40,.41,.43]]]) mesh((u,v)=>{ const t=u*Math.PI*2,q=v*Math.PI*2; const n=[Math.cos(t)*Math.cos(q),Math.sin(t)*Math.cos(q),Math.sin(q)];const r=1.53+.068*Math.cos(q); return [rotate([r*Math.cos(t),r*Math.sin(t),.068*Math.sin(q)],a,b),rotate(n,a,b)]; },160,14,col);
-  mesh((u,v)=>{ const a=u*Math.PI*2,b=v*Math.PI;const n=[Math.cos(a)*Math.sin(b),Math.cos(b),Math.sin(a)*Math.sin(b)];return [n.map(x=>x*.61),n]; },64,40,accent);
-  for (const [cx,cy,cz,radius,col] of [[1.36,.38,.3,.12,accent],[-1.1,-.85,.2,.09,[.7,.71,.73]],[.3,1.36,-.3,.07,accent]]) {
-    mesh((u,v)=>{const a=u*Math.PI*2,b=v*Math.PI;const n=[Math.cos(a)*Math.sin(b),Math.cos(b),Math.sin(a)*Math.sin(b)];return [[cx+n[0]*radius,cy+n[1]*radius,cz+n[2]*radius],n];},24,16,col);
-  }
-  const buffer=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buffer);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(data),gl.STATIC_DRAW);
-  for(const [name,offset] of [['position',0],['normal',12],['color',24]]) { const a=gl.getAttribLocation(program,name);gl.enableVertexAttribArray(a);gl.vertexAttribPointer(a,3,gl.FLOAT,false,36,offset); }
-  gl.enable(gl.DEPTH_TEST);gl.clearColor(0,0,0,0);
-  const rot=gl.getUniformLocation(program,'rotation'),aspect=gl.getUniformLocation(program,'aspect'),camera=gl.getUniformLocation(program,'camera'),zoom=gl.getUniformLocation(program,'zoom');
-  const hero = document.querySelector('.hero');
-  let px=0,py=0,rx=.21,ry=-.25,frame=0,visible=true;
-  function draw(){ frame=0;if(gl.isContextLost()) return;const dpr=Math.min(devicePixelRatio,2);const w=Math.round(stage.clientWidth*dpr),h=Math.round(stage.clientHeight*dpr);if(canvas.width!==w||canvas.height!==h){canvas.width=w;canvas.height=h;gl.viewport(0,0,w,h);} const rect=hero.getBoundingClientRect();const scroll=motion.matches?0:Math.max(0,Math.min(1,-rect.top/Math.max(1,rect.height-innerHeight*.5)));rx+=(.21+(motion.matches?0:py*.2)+scroll*1.1-rx)*.08;ry+=(-.25+(motion.matches?0:px*.3)+scroll*1.5-ry)*.08;gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);gl.uniform2f(rot,rx,ry);gl.uniform1f(aspect,w/h);gl.uniform1f(camera,5.7-scroll*.9);gl.uniform1f(zoom,1+scroll*.12);gl.drawArrays(gl.TRIANGLES,0,data.length/9);stage.classList.add('is-ready');if(!motion.matches&&visible&&!document.hidden) frame=requestAnimationFrame(draw); }
-  function wake(){if(!frame) frame=requestAnimationFrame(draw);}
-  stage.addEventListener('pointermove',e=>{const rect=stage.getBoundingClientRect();px=(e.clientX-rect.left)/rect.width-.5;py=(e.clientY-rect.top)/rect.height-.5;wake();});stage.addEventListener('pointerleave',()=>{px=py=0;});
-  new ResizeObserver(wake).observe(stage);
-  new IntersectionObserver(entries=>{visible=entries[0].isIntersecting;if(visible)wake();}).observe(stage);
-  document.addEventListener('visibilitychange',()=>{if(!document.hidden)wake();});
-  motion.addEventListener('change',()=>{rx=.21;ry=-.25;wake();});
-  canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();cancelAnimationFrame(frame);stage.classList.remove('is-ready');});
-  canvas.addEventListener('webglcontextrestored',()=>{stage.classList.remove('is-ready');});
-  wake();
+  const [metadata, response] = await Promise.all([
+    fetch('/assets/orbit-symbol.json').then(r => {if(!r.ok)throw Error('Missing symbol metadata');return r.json();}),
+    fetch('/assets/orbit-symbol.sdf')
+  ]);
+  if(!response.ok)throw Error('Missing symbol geometry');
+  const pixels = new Uint8Array(await response.arrayBuffer());
+  if(pixels.length!==metadata.width*metadata.height)throw Error('Invalid symbol geometry');
+  const vertex = `attribute vec2 position; varying vec2 uv; void main(){uv=position;gl_Position=vec4(position,0.,1.);}`;
+  const fragment = `precision highp float;
+  varying vec2 uv; uniform sampler2D symbol; uniform vec2 shapeSize; uniform float range; uniform vec2 rotation; uniform float aspect; uniform float camera;
+  mat3 turn(){float a=rotation.x,b=rotation.y;float c=cos(a),s=sin(a),d=cos(b),t=sin(b);return mat3(d,0.,-t,0.,1.,0.,t,0.,d)*mat3(1.,0.,0.,0.,c,s,0.,-s,c);}
+  float volume(vec3 p){vec2 coord=vec2(p.x/shapeSize.x+.5,.5-p.y/shapeSize.y);float silhouette=(texture2D(symbol,clamp(coord,0.,1.)).r*2.-1.)*range;vec2 bounds=abs(p.xy)-shapeSize*.5;float box=length(max(bounds,0.))+min(max(bounds.x,bounds.y),0.);silhouette=max(silhouette,box);vec2 d=vec2(silhouette,abs(p.z)-.065);return min(max(d.x,d.y),0.)+length(max(d,0.))-.012;}
+  vec3 normalAt(vec3 p){vec2 e=vec2(.008,0.);return normalize(vec3(volume(p+e.xyy)-volume(p-e.xyy),volume(p+e.yxy)-volume(p-e.yxy),volume(p+e.yyx)-volume(p-e.yyx)));}
+  void main(){mat3 rotationMatrix=turn();vec3 origin=rotationMatrix*vec3(0.,0.,camera);vec3 ray=normalize(rotationMatrix*vec3(uv.x*aspect,uv.y,-2.15));float nearZ=(-.24-origin.z)/ray.z,farZ=(.24-origin.z)/ray.z;float dist=max(min(nearZ,farZ),0.);float end=max(nearZ,farZ);vec3 p;bool hit=false;for(int i=0;i<76;i++){p=origin+ray*dist;float d=volume(p);if(d<.0018){hit=true;break;}dist+=max(d*.8,.001);if(dist>end+.12)break;}if(!hit){gl_FragColor=vec4(0.);return;}vec3 n=normalAt(p);vec3 light=normalize(rotationMatrix*vec3(-.65,.85,1.5));vec3 view=-ray;float diffuse=max(dot(n,light),0.);float spec=pow(max(dot(n,normalize(light+view)),0.),65.);float side=1.-abs(n.z);vec3 base=vec3(.960784,.603922,.172549);float grain=fract(sin(dot(p.xy,vec2(127.1,311.7)))*43758.5453);vec3 colour=base*(.46+.55*diffuse)*(1.-side*.16);colour+=vec3(1.,.88,.61)*spec*.58;colour+=base*.008*(grain-.5);gl_FragColor=vec4(colour,1.);}`;
+  function shader(type,source){const s=gl.createShader(type);gl.shaderSource(s,source);gl.compileShader(s);if(!gl.getShaderParameter(s,gl.COMPILE_STATUS))throw Error('Symbol shader unavailable');return s;}
+  const program=gl.createProgram();gl.attachShader(program,shader(gl.VERTEX_SHADER,vertex));gl.attachShader(program,shader(gl.FRAGMENT_SHADER,fragment));gl.linkProgram(program);if(!gl.getProgramParameter(program,gl.LINK_STATUS))throw Error('Symbol renderer unavailable');gl.useProgram(program);
+  const buffer=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buffer);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]),gl.STATIC_DRAW);const position=gl.getAttribLocation(program,'position');gl.enableVertexAttribArray(position);gl.vertexAttribPointer(position,2,gl.FLOAT,false,0,0);
+  const texture=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,texture);gl.pixelStorei(gl.UNPACK_ALIGNMENT,1);gl.texImage2D(gl.TEXTURE_2D,0,gl.LUMINANCE,metadata.width,metadata.height,0,gl.LUMINANCE,gl.UNSIGNED_BYTE,pixels);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
+  const uniforms=Object.fromEntries(['symbol','shapeSize','range','rotation','aspect','camera'].map(name=>[name,gl.getUniformLocation(program,name)]));gl.uniform1i(uniforms.symbol,0);gl.uniform2f(uniforms.shapeSize,metadata.worldWidth,metadata.worldHeight);gl.uniform1f(uniforms.range,metadata.distanceRange);
+  let px=0,py=0,rx=.035,ry=-.14,frame=0,visible=true,lost=false;
+  const hero=document.querySelector('.hero');
+  function draw(){frame=0;if(lost||!visible||document.hidden)return;const w=Math.round(Math.min(stage.clientWidth,760)),h=Math.round(w*stage.clientHeight/stage.clientWidth);if(canvas.width!==w||canvas.height!==h){canvas.width=w;canvas.height=h;gl.viewport(0,0,w,h);}const progress=motion.matches?0:Math.max(0,Math.min(1,-hero.getBoundingClientRect().top/(innerHeight*.8)));const tx=motion.matches?0:.035+py*.16+progress*.10,ty=motion.matches?0:-.14+px*.23+progress*.18;if(motion.matches){rx=ry=0;}else{rx+=(tx-rx)*.16;ry+=(ty-ry)*.16;}gl.uniform2f(uniforms.rotation,rx,ry);gl.uniform1f(uniforms.aspect,w/h);gl.uniform1f(uniforms.camera,3.8-progress*.12);gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT);gl.drawArrays(gl.TRIANGLES,0,6);stage.classList.add('is-ready');if(Math.abs(rx-tx)+Math.abs(ry-ty)>.0008&&!motion.matches)wake();}
+  function wake(){if(!frame&&!lost)frame=requestAnimationFrame(draw);}
+  stage.addEventListener('pointermove',e=>{if(motion.matches||e.pointerType==='touch')return;const r=stage.getBoundingClientRect();px=(e.clientX-r.left)/r.width-.5;py=(e.clientY-r.top)/r.height-.5;wake();});stage.addEventListener('pointerleave',()=>{px=py=0;wake();});window.addEventListener('scroll',wake,{passive:true});new ResizeObserver(wake).observe(stage);new IntersectionObserver(entries=>{visible=entries[0].isIntersecting;if(visible)wake();}).observe(stage);document.addEventListener('visibilitychange',wake);motion.addEventListener('change',()=>{rx=ry=0;wake();});canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();lost=true;cancelAnimationFrame(frame);stage.classList.remove('is-ready');});wake();
 }
