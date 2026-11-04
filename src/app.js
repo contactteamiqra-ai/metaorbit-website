@@ -1,6 +1,7 @@
 document.documentElement.classList.add('js-enabled');
 import { services } from './content.js';
 import { initOrbit } from './orbit.js';
+import { initExperience } from './experience.js';
 for (const service of services) {
   const row = document.getElementById(service.id);
   row.querySelector('h3').textContent = service.title;
@@ -16,12 +17,7 @@ nav.addEventListener('click', event => { if (event.target.closest('a')) closeMen
 document.addEventListener('keydown', event => { if (event.key === 'Escape' && nav.classList.contains('is-open')) { closeMenu(); toggle.focus(); } });
 document.addEventListener('click', event => { if (!event.target.closest('.site-header')) closeMenu(); });
 const motion = matchMedia('(prefers-reduced-motion: reduce)');
-if (!motion.matches && 'IntersectionObserver' in window) {
-  const observer = new IntersectionObserver(entries => { for (const entry of entries) if (entry.isIntersecting) { entry.target.classList.add('visible'); observer.unobserve(entry.target); } }, { threshold: .06 });
-  document.documentElement.classList.add('js-motion');
-  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-  motion.addEventListener('change', () => { if (motion.matches) document.documentElement.classList.remove('js-motion'); });
-}
+initExperience(motion);
 document.querySelector('button[type=submit]').disabled = false;
 document.querySelector('#contact-form').addEventListener('submit', event => { event.preventDefault(); document.querySelector('#form-status').textContent = 'Your details pass the field checks. Nothing was sent or saved: this preview has no connected contact service.'; });
 document.querySelector('#year').textContent = new Date().getFullYear();
