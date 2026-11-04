@@ -10,4 +10,4 @@ document.addEventListener('click',event=>{if(!event.target.closest('.site-header
 const form=document.querySelector('#contact-form');
 if(form){form.addEventListener('submit',event=>{event.preventDefault();document.querySelector('#form-status').textContent='Your details pass the field checks. Nothing was sent or saved: this preview has no connected contact service.';});form.querySelector('button[type=submit]').disabled=false;}
 const canvas=document.querySelector('#orbit');
-if(canvas){import('./orbit.js').then(({initOrbit})=>initOrbit(canvas,matchMedia('(prefers-reduced-motion: reduce)'))).catch(()=>{/* The original isolated symbol stays visible if WebGL or geometry loading fails. */});}
+if(canvas){import('./home-motion.js').then(({initHomeMotion})=>initHomeMotion(matchMedia('(prefers-reduced-motion: reduce)')));import('./orbit.js').then(({initOrbit})=>initOrbit(canvas,matchMedia('(prefers-reduced-motion: reduce)'))).catch(()=>{/* The original isolated symbol stays visible if WebGL or geometry loading fails. */});}

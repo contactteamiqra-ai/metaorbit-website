@@ -15,5 +15,5 @@ const original=await readFile('metaorbit_logo_white_HD.png');
 assert.deepEqual(await readFile('src/assets/metaorbit_logo_white_HD.png'),original);
 assert.deepEqual(await readFile('dist/assets/metaorbit_logo_white_HD.png'),original);
 const meta=JSON.parse(await readFile('dist/assets/orbit-symbol.json','utf8'));
-assert.equal((await readFile('dist/assets/orbit-symbol.sdf')).length,meta.width*meta.height);
+assert.equal((await readFile('dist/assets/orbit-symbol.sdf')).length,meta.width*meta.height*meta.bytesPerSample);
 console.log('PASS: eight distinct static pages, all local navigation/assets, original logos and geometry integrity.');

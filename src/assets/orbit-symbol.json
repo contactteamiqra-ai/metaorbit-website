@@ -7,8 +7,10 @@
     638,
     852
   ],
-  "width": 384,
-  "height": 512,
+  "width": 512,
+  "height": 684,
+  "bytesPerSample": 2,
+  "encoding": "uint16-la",
   "worldHeight": 2.9,
   "worldWidth": 2.1715962441314556,
   "distanceRange": 0.22,

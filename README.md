@@ -38,7 +38,8 @@ Each URL has a real `index.html` file in its directory. Direct visits and refres
 - `scripts/pages.mjs` — seven inner pages with distinct purposes and original copy
 - `scripts/site.mjs` — shared header/footer, document metadata and route list
 - `src/styles.css` — baseline typography, controls and palette
-- `src/site.css` — current hero, navigation and restrained inner-page layouts
+- `src/site.css` — shared navigation and restrained inner-page layouts
+- `src/home.css` and `src/home-motion.js` — homepage-only expressive hero, scroll transitions and service illustrations; neither file is loaded by an inner page
 - `src/app.js` — menu, keyboard controls, safe preview form, homepage-only renderer loading
 - `scripts/build.mjs` — static page generation and unchanged asset copying
 
@@ -46,16 +47,20 @@ The header and footer use the **complete original transparent PNG**, unaltered. 
 
 ## Original orbital symbol
 
-`src/orbit.js` renders a volumetric extrusion of the orange symbol's raster silhouette, including its negative spaces. It uses the numeric signed-distance field in `src/assets/orbit-symbol.sdf`, with provenance and original-source SHA256 in `orbit-symbol.json`. The front/back, shallow side surfaces and small bevel are part of a 3D field; no rectangular logo plane, generic rings or sphere is used.
+`src/orbit.js` renders a volumetric extrusion of the orange symbol's raster silhouette, including its negative spaces. It uses the numeric signed-distance field in `src/assets/orbit-symbol.sdf`, with provenance and original-source SHA256 in `orbit-symbol.json`. The front/back, deeper side surfaces and soft bevel are part of a 3D field; no rectangular logo plane, generic rings or sphere is used.
 
 The PNG is sufficient for a recognizable silhouette. It is not vector artwork: fine edge detail is raster-derived and will not be as clean as an approved vector source. No different shape was substituted. The static fallback clips and colour-isolates the unchanged PNG at render time, excluding all lettering. Header/footer images receive no such processing.
 
 `python3 scripts/derive-symbol.py` optionally regenerates the numeric geometry (requires Pillow, NumPy and SciPy). These are asset-authoring dependencies only; they are not needed to build, host or run the website.
 
-Motion is limited to small pointer and scroll responses. The renderer settles and stops requesting frames when idle, pauses offscreen, and uses a fixed front-facing pose under reduced motion. Without WebGL, or on load/context failure, the original-symbol fallback stays visible. Important content and navigation work without JavaScript.
+The homepage review uses controlled pointer response, a scroll-driven camera turn, and a shrinking/drifting symbol handoff into the introduction. Studio-style metallic key/fill/reflection lighting keeps the mark recognisable. The numerical silhouette is stored at 16-bit precision to reduce lighting banding; it still comes from the original PNG, not a substitute shape. The renderer settles and stops requesting frames when idle, pauses offscreen, and uses a fixed front-facing pose under reduced motion. Without WebGL, or on load/context failure, the original-symbol fallback stays visible. Important content and navigation work without JavaScript.
 
 ## Review limitations
 
 The overall visual direction is **not approved**. Hero review comes before extending this treatment across inner pages. Portfolio entries are placeholders, not completed work or claimed results. The contact form validates locally and explicitly says nothing is sent or saved; it remains disabled without JavaScript. Before launch it needs a real delivery endpoint, spam handling, privacy information and delivery verification. No team size, office, certification, client result, testimonial or partnership is invented.
 
 No merge or deployment is part of this review. Work continues on `feat/metaorbit-homepage` / PR #1.
+
+## Homepage refinement checkpoint
+
+The three homepage service illustrations explain a buying journey, connected actions from one enquiry, and a lead moving through a CRM pipeline. They respond to native scroll; mobile shows them inline with a lower rendering budget, while reduced motion uses fixed/completed diagrams and a static hero pose. Offscreen scenes avoid unnecessary updates. The seven generated inner-page HTML files remain byte-identical to the prior review version. This homepage direction is still awaiting design approval; it has not been extended across the remaining pages.
